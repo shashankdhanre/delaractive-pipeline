@@ -1,0 +1,55 @@
+pipeline {
+    agent any
+
+environment {
+        Java_Home = 'C:/Program Files/Java/jdk1.8.0_201' 
+        }
+
+    stages {
+    
+    stage('Checkout code') {
+            steps {
+                echo '..................................Checkout code Start.........................'
+               checkout([$class: 'GitSCM', branches: [[name: '*/master']], 
+               doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs:
+               [[credentialsId: 'Git', url: 'https://github.com/sachinrokade/Rest-Curd.git']]])
+                echo '..................................Checkout End.........................'
+            }
+        }
+        stage('Build') {
+            steps {
+               echo '..................................Building Start.........................'
+                bat 'mvn clean compile'
+                echo '..................................Building End.........................'
+            }
+        }
+        stage('Qulity_Checkstyle') {
+            steps {
+               echo '..................................Qulity_Checkstyle Start.........................'
+                bat 'mvn checkstyle:checkstyle'
+                echo '..................................Qulity_Checkstyle End.........................'
+            }
+        }
+        stage('Qulity_PMD') {
+            steps {
+               echo '..................................Qulity_PMD Start.........................'
+                bat 'mvn pmd:pmd'
+                echo '..................................Qulity_PMD End.........................'
+            }
+        }
+        
+        
+        stage('Test') {
+            steps {
+               echo '..................................Testing Start.........................'
+                bat 'mvn clean test'
+                echo '..................................Testing End.........................'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                echo 'Deploying....'
+            }
+        }
+    }
+}
